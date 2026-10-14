@@ -20,7 +20,12 @@ function required(name) {
 function accessToken() {
   const value = required('MP_ACCESS_TOKEN').trim();
   if (!/^(APP_USR|TEST)-[\w-]+$/.test(value)) {
-    console.error('MP_ACCESS_TOKEN tiene un formato inválido (¿quedó cortado o con caracteres como "…"?). Pegá el token completo.');
+    // Pistas para encontrar el error sin mostrar el token
+    const bad = value.search(/[^\w-]/);
+    const hint = bad >= 0
+      ? `carácter inválido en la posición ${bad}: U+${value.codePointAt(bad).toString(16).toUpperCase().padStart(4, '0')} ${JSON.stringify(value[bad])}`
+      : `empieza con ${JSON.stringify(value.slice(0, 8))} (debería empezar con "APP_USR-" o "TEST-")`;
+    console.error(`MP_ACCESS_TOKEN tiene un formato inválido (${value.length} caracteres; ${hint}). Pegá solo el token, sin comillas ni "MP_ACCESS_TOKEN=".`);
     process.exit(1);
   }
   return value;
