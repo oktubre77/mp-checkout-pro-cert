@@ -1,0 +1,21 @@
+{
+  "name": "mp-checkout-pro-cert",
+  "version": "1.0.0",
+  "description": "Integración de Checkout Pro de Mercado Pago (Node.js + Express) para la certificación del Partners Program",
+  "main": "src/server.js",
+  "type": "module",
+  "scripts": {
+    "start": "node src/server.js",
+    "dev": "node --watch src/server.js"
+  },
+  "engines": {
+    "node": ">=18"
+  },
+  "dependencies": {
+    "dotenv": "^17.2.0",
+    "express": "^5.1.0",
+    "mercadopago": "^3.6.1"
+  },
+  "license": "UNLICENSED",
+  "private": true
+}

@@ -1,0 +1,17 @@
+# Blueprint de Render (plan gratuito). En el dashboard: New > Blueprint > elegí este repo.
+# BASE_URL no hace falta: el servidor usa RENDER_EXTERNAL_URL, que Render define solo.
+services:
+  - type: web
+    name: mp-checkout-pro-german
+    runtime: docker
+    plan: free
+    region: oregon
+    healthCheckPath: /health
+    envVars:
+      # Secretos: Render los pide al crear el Blueprint (no se guardan en el repo).
+      - key: MP_ACCESS_TOKEN
+        sync: false
+      - key: MP_WEBHOOK_SECRET
+        sync: false
+      - key: TEST_PAYER_EMAIL
+        value: test_user_comprador@testuser.com

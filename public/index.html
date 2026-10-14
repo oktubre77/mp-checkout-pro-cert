@@ -1,0 +1,56 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Tienda IoT · Checkout Pro</title>
+  <link rel="stylesheet" href="/styles.css">
+</head>
+<body>
+  <main class="card">
+    <img src="/img/producto.svg" alt="Producto" class="product-img" width="240" height="160">
+    <h1 id="title">Cargando…</h1>
+    <p id="description"></p>
+    <p class="price" id="price"></p>
+
+    <label for="qty">Cantidad</label>
+    <input id="qty" type="number" min="1" max="10" value="1">
+
+    <button id="pay" class="btn">Pagar con Mercado Pago</button>
+    <p id="msg" class="msg" role="status"></p>
+    <p class="note">Entorno de prueba: usá un usuario comprador de prueba y una tarjeta de prueba.</p>
+  </main>
+
+  <script>
+    const fmt = (n, cur) => new Intl.NumberFormat('es-AR', { style: 'currency', currency: cur }).format(n);
+
+    fetch('/api/product').then(r => r.json()).then(p => {
+      document.getElementById('title').textContent = p.title;
+      document.getElementById('description').textContent = p.description;
+      document.getElementById('price').textContent = fmt(p.unitPrice, p.currencyId);
+    });
+
+    document.getElementById('pay').addEventListener('click', async (e) => {
+      const btn = e.currentTarget;
+      const msg = document.getElementById('msg');
+      btn.disabled = true;
+      msg.textContent = 'Creando la preferencia…';
+      try {
+        const quantity = Number(document.getElementById('qty').value) || 1;
+        const res = await fetch('/api/create_preference', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ quantity })
+        });
+        if (!res.ok) throw new Error('Error del servidor');
+        const pref = await res.json();
+        // Con credenciales de prueba, init_point abre el checkout de prueba
+        window.location.href = pref.initPoint || pref.sandboxInitPoint;
+      } catch (err) {
+        msg.textContent = 'No se pudo iniciar el pago. Revisá la consola del servidor.';
+        btn.disabled = false;
+      }
+    });
+  </script>
+</body>
+</html>

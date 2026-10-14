@@ -1,0 +1,29 @@
+# Configuración de Fly.io. Cambiá `app` si el nombre ya está tomado
+# (y actualizá BASE_URL para que coincida).
+app = 'mp-checkout-pro-german'
+primary_region = 'gru'
+
+[build]
+
+[env]
+  PORT = '3000'
+  BASE_URL = 'https://mp-checkout-pro-german.fly.dev'
+
+[http_service]
+  internal_port = 3000
+  force_https = true
+  auto_stop_machines = 'stop'
+  auto_start_machines = true
+  min_machines_running = 0
+
+  [[http_service.checks]]
+    grace_period = '10s'
+    interval = '30s'
+    method = 'GET'
+    path = '/health'
+    timeout = '5s'
+
+[[vm]]
+  memory = '256mb'
+  cpu_kind = 'shared'
+  cpus = 1
