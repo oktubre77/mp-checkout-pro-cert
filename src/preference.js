@@ -14,7 +14,7 @@ function mpDate(date) {
 }
 
 export function buildPreferenceBody({ quantity = 1 } = {}) {
-  const externalReference = `ORDER-${Date.now()}-${randomUUID().slice(0, 8)}`;
+  const externalReference = env.externalReference;
   const now = new Date();
   const hours = (h) => new Date(now.getTime() + h * 60 * 60 * 1000);
 

@@ -42,6 +42,8 @@ export const env = {
   integratorId: process.env.MP_INTEGRATOR_ID || 'dev_24c65fb163bf11ea96500242ac130004',
   webhookSecret: process.env.MP_WEBHOOK_SECRET || undefined,
   testPayerEmail: process.env.TEST_PAYER_EMAIL || 'test_user@testuser.com',
+  // El desafío pide external_reference = email de tu cuenta de Mercado Pago (la de la certificación)
+  externalReference: process.env.MP_EXTERNAL_REFERENCE || 'german.mendoza2021@hotmail.com',
 };
 
 /** Producto de la tienda de ejemplo. */
