@@ -17,8 +17,17 @@ function required(name) {
   return value;
 }
 
+function accessToken() {
+  const value = required('MP_ACCESS_TOKEN').trim();
+  if (!/^(APP_USR|TEST)-[\w-]+$/.test(value)) {
+    console.error('MP_ACCESS_TOKEN tiene un formato inválido (¿quedó cortado o con caracteres como "…"?). Pegá el token completo.');
+    process.exit(1);
+  }
+  return value;
+}
+
 export const env = {
-  accessToken: required('MP_ACCESS_TOKEN'),
+  accessToken: accessToken(),
   // En Render, RENDER_EXTERNAL_URL se define sola con la URL pública del servicio.
   baseUrl: (process.env.BASE_URL || process.env.RENDER_EXTERNAL_URL || required('BASE_URL')).replace(/\/+$/, ''),
   port: Number(process.env.PORT || 3000),
