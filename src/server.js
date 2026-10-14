@@ -18,6 +18,7 @@ app.get('/api/product', (_req, res) => {
     description: product.description,
     unitPrice: product.unitPrice,
     currencyId: product.currencyId,
+    publicKey: env.publicKey ?? null,
   });
 });
 

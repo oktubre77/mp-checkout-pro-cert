@@ -7,8 +7,16 @@ import { preferenceClient } from './mercadopago.js';
  * normalmente se evalúan: ítem completo, payer, back_urls, auto_return,
  * notification_url, external_reference y reglas de medios de pago.
  */
+/** Fecha en formato de Mercado Pago con huso de Argentina: 2026-10-14T12:00:00.000-03:00 */
+function mpDate(date) {
+  const ar = new Date(date.getTime() - 3 * 60 * 60 * 1000);
+  return ar.toISOString().replace('Z', '-03:00');
+}
+
 export function buildPreferenceBody({ quantity = 1 } = {}) {
   const externalReference = `ORDER-${Date.now()}-${randomUUID().slice(0, 8)}`;
+  const now = new Date();
+  const hours = (h) => new Date(now.getTime() + h * 60 * 60 * 1000);
 
   return {
     items: [
@@ -41,6 +49,13 @@ export function buildPreferenceBody({ quantity = 1 } = {}) {
     notification_url: `${env.baseUrl}/webhooks/mercadopago?source_news=webhooks`,
     external_reference: externalReference,
     statement_descriptor: statementDescriptor,
+    binary_mode: paymentRules.binaryMode,
+    // Vigencia de la preferencia
+    expires: true,
+    expiration_date_from: mpDate(now),
+    expiration_date_to: mpDate(hours(paymentRules.preferenceTtlHours)),
+    // Vencimiento de los pagos offline (efectivo)
+    date_of_expiration: mpDate(hours(paymentRules.offlinePaymentDays * 24)),
     payment_methods: {
       excluded_payment_methods: paymentRules.excludedPaymentMethods,
       excluded_payment_types: paymentRules.excludedPaymentTypes,

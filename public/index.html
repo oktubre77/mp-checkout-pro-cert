@@ -17,22 +17,39 @@
     <input id="qty" type="number" min="1" max="10" value="1">
 
     <button id="pay" class="btn">Pagar con Mercado Pago</button>
+    <!-- Botón oficial de Mercado Pago (Wallet Brick) -->
+    <div id="wallet_container"></div>
     <p id="msg" class="msg" role="status"></p>
     <p class="note">Entorno de prueba: usá un usuario comprador de prueba y una tarjeta de prueba.</p>
   </main>
 
+  <!-- SDK JS oficial de Mercado Pago -->
+  <script src="https://sdk.mercadopago.com/js/v2"></script>
   <script>
     const fmt = (n, cur) => new Intl.NumberFormat('es-AR', { style: 'currency', currency: cur }).format(n);
+    const btn = document.getElementById('pay');
+    const msg = document.getElementById('msg');
+    let mp = null;
+    let walletController = null;
 
     fetch('/api/product').then(r => r.json()).then(p => {
       document.getElementById('title').textContent = p.title;
       document.getElementById('description').textContent = p.description;
       document.getElementById('price').textContent = fmt(p.unitPrice, p.currencyId);
+      if (p.publicKey && window.MercadoPago) {
+        mp = new MercadoPago(p.publicKey, { locale: 'es-AR' });
+      }
     });
 
-    document.getElementById('pay').addEventListener('click', async (e) => {
-      const btn = e.currentTarget;
-      const msg = document.getElementById('msg');
+    // Si cambia la cantidad, hay que generar otra preferencia
+    document.getElementById('qty').addEventListener('input', () => {
+      walletController?.unmount();
+      walletController = null;
+      btn.hidden = false;
+      msg.textContent = '';
+    });
+
+    btn.addEventListener('click', async () => {
       btn.disabled = true;
       msg.textContent = 'Creando la preferencia…';
       try {
@@ -44,10 +61,28 @@
         });
         if (!res.ok) throw new Error('Error del servidor');
         const pref = await res.json();
-        // Con credenciales de prueba, init_point abre el checkout de prueba
-        window.location.href = pref.initPoint || pref.sandboxInitPoint;
+
+        if (!mp) {
+          // Sin Public Key: redirección directa. Con credenciales de prueba, init_point abre el checkout de prueba
+          window.location.href = pref.initPoint || pref.sandboxInitPoint;
+          return;
+        }
+
+        // Wallet Brick: botón oficial que abre Checkout Pro en un modal
+        walletController = await mp.bricks().create('wallet', 'wallet_container', {
+          initialization: { preferenceId: pref.id, redirectMode: 'modal' },
+          callbacks: {
+            onError: (error) => {
+              console.error(error);
+              msg.textContent = 'Hubo un problema con el botón de pago. Probá de nuevo.';
+            },
+          },
+        });
+        btn.hidden = true;
+        msg.textContent = 'Tocá el botón de Mercado Pago para completar el pago.';
       } catch (err) {
         msg.textContent = 'No se pudo iniciar el pago. Revisá la consola del servidor.';
+      } finally {
         btn.disabled = false;
       }
     });

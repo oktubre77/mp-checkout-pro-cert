@@ -13,5 +13,7 @@ services:
         sync: false
       - key: MP_WEBHOOK_SECRET
         sync: false
+      - key: MP_PUBLIC_KEY
+        sync: false
       - key: TEST_PAYER_EMAIL
         value: test_user_comprador@testuser.com

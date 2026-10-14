@@ -28,6 +28,8 @@ function accessToken() {
 
 export const env = {
   accessToken: accessToken(),
+  // Public Key de prueba: la usa el SDK JS del frontend (Wallet Brick). Es pública por diseño.
+  publicKey: process.env.MP_PUBLIC_KEY?.trim() || undefined,
   // En Render, RENDER_EXTERNAL_URL se define sola con la URL pública del servicio.
   baseUrl: (process.env.BASE_URL || process.env.RENDER_EXTERNAL_URL || required('BASE_URL')).replace(/\/+$/, ''),
   port: Number(process.env.PORT || 3000),
@@ -56,6 +58,12 @@ export const paymentRules = {
   excludedPaymentTypes: [],
   // Máximo de cuotas ofrecidas
   maxInstallments: 6,
+  // true: el pago se aprueba o rechaza al instante (sin estado pendiente)
+  binaryMode: true,
+  // Horas que la preferencia sigue vigente desde que se crea
+  preferenceTtlHours: 24,
+  // Días para pagar un medio offline (efectivo) antes de que venza
+  offlinePaymentDays: 3,
 };
 
 /** Texto que ve el comprador en el resumen de la tarjeta (máx. 13 caracteres aprox.). */
