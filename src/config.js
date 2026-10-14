@@ -38,7 +38,8 @@ export const env = {
   // En Render, RENDER_EXTERNAL_URL se define sola con la URL pública del servicio.
   baseUrl: (process.env.BASE_URL || process.env.RENDER_EXTERNAL_URL || required('BASE_URL')).replace(/\/+$/, ''),
   port: Number(process.env.PORT || 3000),
-  integratorId: process.env.MP_INTEGRATOR_ID || undefined,
+  // Integrator ID que asigna el desafío de certificación (no es secreto)
+  integratorId: process.env.MP_INTEGRATOR_ID || 'dev_24c65fb163bf11ea96500242ac130004',
   webhookSecret: process.env.MP_WEBHOOK_SECRET || undefined,
   testPayerEmail: process.env.TEST_PAYER_EMAIL || 'test_user@testuser.com',
 };
